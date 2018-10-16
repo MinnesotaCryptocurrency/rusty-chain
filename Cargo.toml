@@ -1,0 +1,15 @@
+[package]
+name = "blockchain-rust"
+version = "0.1.0"
+authors = ["Jacob Lindahl <linda187@umn.edu>"]
+
+[lib]
+name = "rusty_chain"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[dependencies]
+md5 = "0.5.0"
+hex = "0.3.2"
