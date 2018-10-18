@@ -53,4 +53,28 @@ impl fmt::Debug for Block {
 }
 
 impl Block {
+    pub fn new (index: u32, timestamp: u64, prev_block_hash: BlockHash, payload: String) -> Self {
+        return Block {
+            index,
+            timestamp,
+            prev_block_hash,
+            nonce: 0,
+            hash: [0; 16],
+            payload,
+        };
+    }
+
+    pub fn calc_hash (&self) -> BlockHash {
+        let mut bytes = vec![];
+        bytes.extend(u32_bytes(&self.index).iter());
+        bytes.extend(u64_bytes(&self.timestamp).iter());
+        bytes.extend((&self.prev_block_hash).iter().cloned());
+        bytes.extend(u64_bytes(&self.nonce).iter());
+        bytes.extend((&self.payload).as_bytes().iter().cloned());
+
+        let mut h = md5::Context::new();
+        h.consume(bytes);
+
+        h.compute().0
+    }
 }
