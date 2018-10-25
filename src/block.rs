@@ -54,7 +54,7 @@ impl fmt::Debug for Block {
 
 impl Block {
     pub fn new (index: u32, timestamp: u64, prev_block_hash: BlockHash, payload: String) -> Self {
-        return Block {
+        let mut b = Block {
             index,
             timestamp,
             prev_block_hash,
@@ -62,6 +62,10 @@ impl Block {
             hash: [0; 16],
             payload,
         };
+
+        b.hash();
+
+        b
     }
 
     pub fn calc_hash (&self) -> BlockHash {
@@ -76,5 +80,32 @@ impl Block {
         h.consume(bytes);
 
         h.compute().0
+    }
+
+    pub fn hash (&mut self) {
+        self.hash = self.calc_hash();
+    }
+
+    pub fn calc_diff (&self) -> u8 {
+        let mut count = 0;
+
+        for b in &self.hash {
+            if *b != 0 {
+                break;
+            }
+
+            count += 1;
+        }
+
+        count
+    }
+
+    pub fn mine (&mut self, difficulty: u8) {
+        self.nonce = 0;
+        self.hash();
+        while self.calc_diff() < difficulty {
+            self.nonce += 1;
+            self.hash();
+        }
     }
 }

@@ -4,15 +4,28 @@ extern crate time;
 use rusty_chain::*;
 
 fn main () {
-    let b = Block::new(0, 13452, [0; 16], String::from("Block"));
+    let difficulty = 2;
 
-    let h = b.calc_hash();
+    let mut b = Blockchain::new();
 
-    for b in &h {
-        print!("{} ", b);
+    let p = b.blocks[b.blocks.len() - 1].hash.clone();
+    let mut s = Block::new(1, 123445, p, String::from("Block 1"));
+    s.mine(difficulty);
+    b.add(s);
+
+    let p = b.blocks[b.blocks.len() - 1].hash.clone();
+    let mut s = Block::new(2, 123445, p, String::from("Block 2"));
+    s.mine(difficulty);
+    b.add(s);
+
+    let p = b.blocks[b.blocks.len() - 1].hash.clone();
+    let mut s = Block::new(3, 123445, p, String::from("Block 3"));
+    s.mine(difficulty);
+    b.add(s);
+
+    for s in &b.blocks {
+        println!("{:?}", s);
     }
 
-    println!("");
-
-    println!("{:?}", b);
+    println!("{:?}", b.verify());
 }
