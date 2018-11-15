@@ -1,33 +1,13 @@
 extern crate md5;
 extern crate hex;
 
+use to_bytes::*;
+use thashable::*;
+use transaction::Tx;
 use std::time::SystemTime;
 use std::fmt;
 
 type BlockHash = [u8; 16];
-
-fn u32_bytes (u: &u32) -> [u8; 4] {
-    [
-        (u >> 8 * 0) as u8,
-        (u >> 8 * 1) as u8,
-        (u >> 8 * 2) as u8,
-        (u >> 8 * 3) as u8,
-    ]
-}
-
-fn u64_bytes (u: &u64) -> [u8; 8] {
-    [
-        (u >> 8 * 0) as u8,
-        (u >> 8 * 1) as u8,
-        (u >> 8 * 2) as u8,
-        (u >> 8 * 3) as u8,
-
-        (u >> 8 * 4) as u8,
-        (u >> 8 * 5) as u8,
-        (u >> 8 * 6) as u8,
-        (u >> 8 * 7) as u8,
-    ]
-}
 
 fn now () -> u64 {
     let time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
@@ -41,7 +21,7 @@ pub struct Block {
     pub hash: BlockHash,
     pub nonce: u64,
 
-    pub payload: String,
+    pub payload: Vec<Tx>,
 }
 
 impl fmt::Debug for Block {
@@ -53,7 +33,7 @@ impl fmt::Debug for Block {
 }
 
 impl Block {
-    pub fn new (index: u32, timestamp: u64, prev_block_hash: BlockHash, payload: String) -> Self {
+    pub fn new (index: u32, timestamp: u64, prev_block_hash: BlockHash, payload: Vec<Tx>) -> Self {
         let mut b = Block {
             index,
             timestamp,
@@ -74,7 +54,10 @@ impl Block {
         bytes.extend(u64_bytes(&self.timestamp).iter());
         bytes.extend((&self.prev_block_hash).iter().cloned());
         bytes.extend(u64_bytes(&self.nonce).iter());
-        bytes.extend((&self.payload).as_bytes().iter().cloned());
+
+        for tx in &self.payload {
+            bytes.extend(tx.calc_hash().iter());
+        }
 
         let mut h = md5::Context::new();
         h.consume(bytes);

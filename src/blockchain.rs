@@ -6,7 +6,7 @@ pub struct Blockchain {
 
 impl Blockchain {
     pub fn new () -> Self {
-        let g = Block::new(0, 349084, [0; 16], String::from("Genesis Block"));
+        let g = Block::new(0, 0, [0; 16], vec![]);
         Blockchain {
             blocks: vec![g],
         }
