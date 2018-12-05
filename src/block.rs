@@ -4,27 +4,21 @@ extern crate hex;
 use to_bytes::*;
 use thashable::*;
 use transaction::Tx;
-use std::time::SystemTime;
 use std::fmt;
 
 type BlockHash = [u8; 16];
 
-fn now () -> u64 {
-    let time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
-    time.as_secs() * 1000 + time.subsec_millis() as u64
-}
-
-pub struct Block {
+pub struct Block<'a> {
     pub index: u32,
     pub timestamp: u64,
     pub prev_block_hash: BlockHash,
     pub hash: BlockHash,
     pub nonce: u64,
 
-    pub payload: Vec<Tx>,
+    pub payload: Vec<Tx<'a>>,
 }
 
-impl fmt::Debug for Block {
+impl<'a> fmt::Debug for Block<'a> {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let h_str = hex::encode(&self.hash);
@@ -32,8 +26,8 @@ impl fmt::Debug for Block {
     }
 }
 
-impl Block {
-    pub fn new (index: u32, timestamp: u64, prev_block_hash: BlockHash, payload: Vec<Tx>) -> Self {
+impl<'a> Block<'a> {
+    pub fn new (index: u32, timestamp: u64, prev_block_hash: BlockHash, payload: Vec<Tx<'a>>) -> Self {
         let mut b = Block {
             index,
             timestamp,

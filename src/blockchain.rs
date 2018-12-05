@@ -1,10 +1,10 @@
 use block::Block;
 
-pub struct Blockchain {
-    pub blocks: Vec<Block>,
+pub struct Blockchain<'a> {
+    pub blocks: Vec<Block<'a>>,
 }
 
-impl Blockchain {
+impl<'a> Blockchain<'a> {
     pub fn new () -> Self {
         let g = Block::new(0, 0, [0; 16], vec![]);
         Blockchain {
@@ -12,7 +12,7 @@ impl Blockchain {
         }
     }
 
-    pub fn add (&mut self, block: Block) {
+    pub fn add (&mut self, block: Block<'a>) {
         self.blocks.push(block);
     }
 
