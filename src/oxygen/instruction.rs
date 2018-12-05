@@ -7,7 +7,7 @@ use thashable::*;
 
 #[derive(Debug)]
 pub enum Value {
-    Int32(u32),
+    Int32(i32),
     Bool(bool),
     Str(String),
     Hash([u8; 16]),
@@ -30,7 +30,7 @@ impl THashable for Value {
     fn calc_hash (&self) -> [u8; 16] {
         match self {
             Value::Bool(x) => md5::compute([*x as u8]),
-            Value::Int32(x) => md5::compute(u32_bytes(&x)),
+            Value::Int32(x) => md5::compute(i32_bytes(&x)),
             Value::Str(x) => md5::compute(x.to_string().as_bytes()),
             Value::Hash(x) => md5::compute(x),
             _ => panic!("Cannot hash"),
@@ -43,14 +43,15 @@ pub enum Instruction {
     NOP,
     Push(Value),
     Pop,
+    Dup,
+    Assert,
     Equal,
     GreaterThan,
     GreaterThanEqualTo,
-    Not,
-    Hash,
-    Dup,
     And,
     Or,
+    Not,
+    Hash,
     Add,
     Sub,
     Mul,
@@ -99,6 +100,13 @@ impl Instruction {
             },
             Instruction::Pop => {
                 stack.pop();
+            },
+            Instruction::Assert => {
+                let a = to_value(stack.pop());
+                match a {
+                    Value::Bool(true) => (),
+                    _ => stack.push(Value::Error),
+                }
             },
             Instruction::Equal => {
                 let a = to_value(stack.pop());
@@ -168,7 +176,7 @@ impl Instruction {
                 } else {
                     let v = match a {
                         Value::Bool(x) => md5::compute([x as u8]),
-                        Value::Int32(x) => md5::compute(u32_bytes(&x)),
+                        Value::Int32(x) => md5::compute(i32_bytes(&x)),
                         Value::Str(x) => md5::compute(x.to_string().as_bytes()),
                         Value::Hash(x) => md5::compute(x),
                         _ => unreachable!(),

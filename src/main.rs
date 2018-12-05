@@ -17,6 +17,27 @@ fn demo_oxygen_script () {
     println!("Result: {}", os.run());
 }
 
+fn demo_oxygen_script2 () {
+    let os = OxygenScript {
+        input: &vec![
+            Value::Int32(21),
+        ],
+        instructions: &vec![
+            Instruction::Push(Value::Int32(20)),
+            Instruction::Sub,
+            Instruction::Dup,
+            Instruction::Push(Value::Int32(5)),
+            Instruction::GreaterThanEqualTo,
+            Instruction::Assert,
+            Instruction::Push(Value::Int32(0)),
+            Instruction::GreaterThan,
+            Instruction::Not,
+        ],
+    };
+
+    println!("Result: {}", os.run());
+}
+
 fn demo_blockchain () {
     let difficulty = 2;
 
